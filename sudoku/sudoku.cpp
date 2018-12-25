@@ -2,13 +2,14 @@
 //
 
 #include "pch.h"
+#include "solver.h"
 #include <iostream>
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
 #include <algorithm>
 #include <ctime>
-#include "solver.h"
+
 using namespace std;
 
 static FILE * WriteP = NULL;//用于写数独终局
@@ -81,6 +82,7 @@ static char tmpSudoMatrix[9][18];	//记录每次列变换之后的数独终局
 static char tmpSudoMatrix2[9][18];	//记录每次行变换之后的数独终局
 
 static char FinalSudo[1000000 * (9 * 18 + 1)];
+static char SudoProblem[1000000 * (9 * 18 + 1)];
 
 static void GenerateSudo(int Num) {
 
@@ -193,6 +195,7 @@ static bool CheckSudoValid(char Matrix[9][18]) {
 
 int main(int argc, char * argv[])
 {
+	FILE *absolute_path_of_puzzlefile = NULL;
 	if (fopen_s(&WriteP, "sudoku.txt", "w")) {
 		printf("sudoku.txt打开失败\n");
 		exit(1);
@@ -216,6 +219,10 @@ int main(int argc, char * argv[])
 	else if (argc == 3 && !strcmp("-s", argv[1]) && strlen(argv[1]) == 2) {//-s
 
 		printf("这是一个关于求解数独的测试分支!！\n");
+		if (fopen_s(&absolute_path_of_puzzlefile, argv[2], "r")) {
+			printf("sudoku.txt打开失败\n");
+			exit(1);
+		}
 		return 0;
 	}
 	else {
@@ -233,8 +240,8 @@ int main(int argc, char * argv[])
 
 	fclose(WriteP);
 	clock_t StartSolve = EndGenerate;
-
-	//SolveSudo();	//求解数独
+	
+	int flag = Solver(SudoProblem);	//求解数独
 
 }
 
