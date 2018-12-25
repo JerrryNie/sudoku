@@ -8,9 +8,10 @@
 #include <cstdlib>
 #include <algorithm>
 #include <ctime>
+#include "solver.h"
 using namespace std;
 
-FILE * WriteP = NULL;//用于写数独终局
+static FILE * WriteP = NULL;//用于写数独终局
 
 const static int RowTransNum = 30;		//行变换总数为30个
 const static int ColTransNum = 40320;	//列变换总数为40320个
@@ -79,7 +80,9 @@ static char Rrow[11] = { '5', '1', '2', '3', '4', '6', '7', '8', '9', '\0', '\0'
 static char tmpSudoMatrix[9][18];	//记录每次列变换之后的数独终局
 static char tmpSudoMatrix2[9][18];	//记录每次行变换之后的数独终局
 
-void GenerateSudo(int Num) {
+static char FinalSudo[1000000 * (9 * 18 + 1)];
+
+static void GenerateSudo(int Num) {
 
 	int cntGenerate = 0;	 //记录当前生成的数独数
 
@@ -102,18 +105,24 @@ void GenerateSudo(int Num) {
 		//tmpSudoMatrix[9][1] = '\0';
 		for (int i = 0; i < RowTransNum; i++) {		//遍历所有的行变换
 			
-			if (cntGenerate >= Num) return; //当达到最大的生成数量时，即停止生成
+			if (cntGenerate >= Num) {
 
+				fwrite(FinalSudo, sizeof(char), cntGenerate * (sizeof(tmpSudoMatrix2) + 1) - 2, WriteP);//打印本终局
+				return; //当达到最大的生成数量时，即停止生成
+			}
 			for (int j = 0; j < Row; j++) {//“+1”是为了输入回车换行
 				//printf("j = %d:", j);
 					memcpy(tmpSudoMatrix2[j], tmpSudoMatrix[RowTrans[i][j] - 1], sizeof(tmpSudoMatrix[j]));
 					//fwrite(tmpSudoMatrix[RowTrans[i][j] - 1], sizeof(char), sizeof(tmpSudoMatrix[RowTrans[i][j] - 1]) / sizeof(char), WriteP);
 					//fwrite(tmpSudoMatrix[RowTrans[i][j] - 1], 1, 18, WriteP);
+				
 			}
 			//tmpSudoMatrix2[9][0] = '\n';	
 			
-			fwrite(tmpSudoMatrix2, sizeof(char), sizeof(tmpSudoMatrix2) / sizeof(char), WriteP);//打印本终局
-			fputc('\n', WriteP);
+			//fwrite(tmpSudoMatrix2, sizeof(char), sizeof(tmpSudoMatrix2) / sizeof(char), WriteP);//打印本终局
+			memcpy(FinalSudo + cntGenerate * (sizeof(tmpSudoMatrix2) + 1), tmpSudoMatrix2, sizeof(tmpSudoMatrix2));
+			memcpy(FinalSudo + cntGenerate * (sizeof(tmpSudoMatrix2) + 1) + sizeof(tmpSudoMatrix2), "\n", 1);
+			//fputc('\n', WriteP);
 			cntGenerate++;
 			
 			
@@ -123,7 +132,7 @@ void GenerateSudo(int Num) {
 	}
 }
 
-bool CheckValid(char * str) {//检查输入参数是否为int
+static bool CheckValid(char * str) {//检查输入参数是否为int
 
 	int len = strlen(str);
 	for (int i = 0; i < len; i++) {
@@ -131,6 +140,55 @@ bool CheckValid(char * str) {//检查输入参数是否为int
 			return false;
 	}
 	return true;
+}
+
+static bool CheckSudoValid(char Matrix[9][18]) {
+
+	char BitMap[10];
+	memset(BitMap, sizeof(BitMap), 0);
+
+	for (int r = 0; r < 9; r++) {//检查行方向有效性
+		for (int c = 0; c < 18; c++) {
+			BitMap[Matrix[r][c * 2] - '0'] = 1;
+		}
+		for(int i = 1; i <= 9; i++) 
+			if (BitMap[i] == 0) {
+				return false;
+			}
+	}
+
+	for (int c = 0; c < 9; c++) {//检查列方向有效性
+		for (int r = 0; r < 18; r++) {
+			BitMap[Matrix[r][c * 2] - '0'] = 1;
+		}
+		for (int i = 1; i <= 9; i++)
+			if (BitMap[i] == 0) {
+				return false;
+				memset(BitMap, sizeof(BitMap), 0);
+			}
+	}
+	const int dr[] = {0, 1, 2};
+	const int dc[] = {0, 1, 2};
+	const int x[] = {0, 3, 6};
+	const int y[] = { 0, 3, 6 };
+	for (int cx = 0; cx < 3; cx++) {
+		for (int cy = 0; cy < 3; cy++) {
+			for (int i = 0; i < 3; i++) {
+					for (int j = 0; j < 3; j++) {
+						int tmpx = x[cx] + dr[i];
+						int tmpy = x[cy] + dc[j];
+						BitMap[Matrix[tmpx][tmpy] - '0'] = 1;
+				}
+			}
+			for (int i = 1; i <= 9; i++)
+				if (BitMap[i] == 0) {
+					return false;
+				}
+			memset(BitMap, sizeof(BitMap), 0);
+		}
+	}
+	
+
 }
 
 int main(int argc, char * argv[])
