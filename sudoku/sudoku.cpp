@@ -1,8 +1,9 @@
-﻿// sudoku.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
+// sudoku.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
 //
 
 #include "pch.h"
 #include "solver.h"
+#include "CheckSudo.h"
 #include <iostream>
 #include <cstdio>
 #include <cstring>
@@ -83,7 +84,7 @@ static char tmpSudoMatrix2[9][18];	//记录每次行变换之后的数独终局
 
 static char FinalSudo[1000000 * (9 * 18 + 1)];
 static char SudoProblem[1000000 * (9 * 18 + 1)];
-
+static char CheckMat[1000];
 static void GenerateSudo(int Num) {
 
 	int cntGenerate = 0;	 //记录当前生成的数独数
@@ -110,6 +111,7 @@ static void GenerateSudo(int Num) {
 			if (cntGenerate >= Num) {
 
 				fwrite(FinalSudo, sizeof(char), cntGenerate * (sizeof(tmpSudoMatrix2) + 1) - 2, WriteP);//打印本终局
+				//CheckSudo(FinalSudo, cntGenerate * (sizeof(tmpSudoMatrix2) + 1) - 2);//用以检测数独终局的合法性
 				return; //当达到最大的生成数量时，即停止生成
 			}
 			for (int j = 0; j < Row; j++) {//“+1”是为了输入回车换行
@@ -144,58 +146,17 @@ static bool CheckValid(char * str) {//检查输入参数是否为int
 	return true;
 }
 
-static bool CheckSudoValid(char Matrix[9][18]) {
 
-	char BitMap[10];
-	memset(BitMap, sizeof(BitMap), 0);
+void CloseAllFile() {//一次性将打开的所有文件关闭
 
-	for (int r = 0; r < 9; r++) {//检查行方向有效性
-		for (int c = 0; c < 18; c++) {
-			BitMap[Matrix[r][c * 2] - '0'] = 1;
-		}
-		for(int i = 1; i <= 9; i++) 
-			if (BitMap[i] == 0) {
-				return false;
-			}
-	}
-
-	for (int c = 0; c < 9; c++) {//检查列方向有效性
-		for (int r = 0; r < 18; r++) {
-			BitMap[Matrix[r][c * 2] - '0'] = 1;
-		}
-		for (int i = 1; i <= 9; i++)
-			if (BitMap[i] == 0) {
-				return false;
-				memset(BitMap, sizeof(BitMap), 0);
-			}
-	}
-	const int dr[] = {0, 1, 2};
-	const int dc[] = {0, 1, 2};
-	const int x[] = {0, 3, 6};
-	const int y[] = { 0, 3, 6 };
-	for (int cx = 0; cx < 3; cx++) {
-		for (int cy = 0; cy < 3; cy++) {
-			for (int i = 0; i < 3; i++) {
-					for (int j = 0; j < 3; j++) {
-						int tmpx = x[cx] + dr[i];
-						int tmpy = x[cy] + dc[j];
-						BitMap[Matrix[tmpx][tmpy] - '0'] = 1;
-				}
-			}
-			for (int i = 1; i <= 9; i++)
-				if (BitMap[i] == 0) {
-					return false;
-				}
-			memset(BitMap, sizeof(BitMap), 0);
-		}
-	}
-	
 
 }
 
 int main(int argc, char * argv[])
 {
 	FILE *absolute_path_of_puzzlefile = NULL;
+	
+	int way = -1;//0表示处理生成，1表示处理求解
 	if (fopen_s(&WriteP, "sudoku.txt", "w")) {
 		printf("sudoku.txt打开失败\n");
 		exit(1);
@@ -215,6 +176,7 @@ int main(int argc, char * argv[])
 				exit(1);
 			}
 		}
+		way = 0;
 	}
 	else if (argc == 3 && !strcmp("-s", argv[1]) && strlen(argv[1]) == 2) {//-s
 
@@ -223,13 +185,14 @@ int main(int argc, char * argv[])
 			printf("sudoku.txt打开失败\n");
 			exit(1);
 		}
-		return 0;
+		//return 0;
+		way = 1;
 	}
 	else {
 		printf("输入操作参数不合法！\n");
 		exit(1);
 	}
-
+	if(way == 0) {
 	clock_t StartGenerate = clock();
 	
 	GenerateSudo(GenerateNum);	//生成相应的数独
@@ -239,10 +202,58 @@ int main(int argc, char * argv[])
 	printf("生成数独用时：%.2fms\n", ((double)(EndGenerate - StartGenerate)));
 
 	fclose(WriteP);
-	clock_t StartSolve = EndGenerate;
-	
-	int flag = Solver(SudoProblem);	//求解数独
+	}
+	else if (way == 1) {
+		/*if (fopen_s(&absolute_path_of_puzzlefile, "F:\\ProblemSudo.txt", "r")) {
+			printf("sudoku.txt打开失败\n");
+			exit(1);
+		}*/
+		clock_t StartSolve = clock();
 
+		//fread(SudoProblem, 1, sizeof(SudoProblem), absolute_path_of_puzzlefile);//从文件读取数独信息
+
+		int idx = 0;
+		char c = 0;
+		while (((c = fgetc(absolute_path_of_puzzlefile)) != EOF) && c) {
+			if ((c >= '0' && c <= '9') || c == ' ') {
+				putchar(c);
+			}
+			else {
+				printf("c = %d\n", c);
+			}
+			//printf("%c", c);
+			
+			SudoProblem[idx] = c;
+			idx++;
+		}
+
+		int flag = Solver(SudoProblem, idx);	//求解数独
+
+		FILE * WriteTheSolution = NULL;
+		for (int i = 0; i < idx; i++)putchar(SudoProblem[i]);
+		if (fopen_s(&WriteTheSolution, "sudoku_test2.txt", "w")) {
+			printf("向sudoku.txt写入最终结果前，打开文件失败\n");
+			exit(1);
+		}
+		printf("---\n");
+		//将文件结果写回文件
+		fwrite(SudoProblem, 1, idx, WriteTheSolution);
+	}
+	//
+	/*FILE * CheckPoint = NULL;
+	if (fopen_s(&CheckPoint, "F:\\CheckSudo.txt", "r")) {
+		printf("提取合法性检验测试文件，打开文件失败\n");
+		exit(1);
+	}
+	char c = 0;
+	int idx = 0;
+	while (((c = fgetc(CheckPoint)) != EOF) && c) {
+		CheckMat[idx] = c;
+		idx++;
+	}
+	CheckSudo(CheckMat, idx);*/
+	//
+	CloseAllFile();
 }
 
 // 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单
