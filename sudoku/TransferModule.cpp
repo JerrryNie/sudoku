@@ -56,8 +56,8 @@ void TransferModule(int way, int GenerateNum, FILE *WriteP, FILE *absolute_path_
 
 		clock_t SolveEnd = clock();//求解数独计时结束
 
-		printf("Generating Sudoku time cost = %.2fms\n", ((double)(SolveEnd - SolveStart)));
+		printf("Solving Sudoku time cost = %.2fms\n", ((double)(SolveEnd - SolveStart)));
 		printf("打印求解数独的结果：\n");
-		for (int i = 0; i < idx; i++)putchar(SudoProblem[i]);//打印出求解数独的结果
+		//for (int i = 0; i < idx; i++)putchar(SudoProblem[i]);//打印出求解数独的结果
 	}
 }
