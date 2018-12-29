@@ -2,21 +2,24 @@
 #include "solver.h"
 #include "pch.h"
 #include <string.h>
-
+#include <stdlib.h>
+#include <stdio.h>
+#include <csetjmp>
 using namespace std;
 
 
 static int asfds = 0;
 static int all = (1 << 9) - 1;
 static int num[1 << 10];
-//FILE *P; //¶ÁÈ¡Êý¶ÀÎÄ¼þ
+static jmp_buf buf;
+//FILE *P; //è¯»å–æ•°ç‹¬æ–‡ä»¶
 
-//extern char * SudoProb; //ÔÚsudokuÖÐÐÞ¸ÄÒªÇó½âµÄÊý¶ÀÌâÄ¿£¬²¢½«´Ë±äÁ¿ÐÞ¸Ä£¬ÔÚ±¾Çó½âº¯ÊýÖÐÊ¹ÓÃ£¬ÒòÎª´«ÈëÊý¾Ý¿ÉÄÜ»áºÜ´ó£¬ËùÒÔ
-static int SudoMat[10][10];//´æ·Åµ±Ç°´ý½âµÄÊý¶À¾ØÕó
+//extern char * SudoProb; //åœ¨sudokuä¸­ä¿®æ”¹è¦æ±‚è§£çš„æ•°ç‹¬é¢˜ç›®ï¼Œå¹¶å°†æ­¤å˜é‡ä¿®æ”¹ï¼Œåœ¨æœ¬æ±‚è§£å‡½æ•°ä¸­ä½¿ç”¨ï¼Œå› ä¸ºä¼ å…¥æ•°æ®å¯èƒ½ä¼šå¾ˆå¤§ï¼Œæ‰€ä»¥
+static int SudoMat[10][10];//å­˜æ”¾å½“å‰å¾…è§£çš„æ•°ç‹¬çŸ©é˜µ
 static int id[10][10];
 static bool JumpOut = false;
 //clock_t Timeout_start, Timeout_end;
-static int FinalIdx = 0;//ÓÃÓÚÏò×îÖÕµÄÇó½â¾ØÕóÖÐÐ´½á¹û(ÀûÓÃ´«ÈëµÄ¾ØÕó)
+static int FinalIdx = 0;//ç”¨äºŽå‘æœ€ç»ˆçš„æ±‚è§£çŸ©é˜µä¸­å†™ç»“æžœ(åˆ©ç”¨ä¼ å…¥çš„çŸ©é˜µ)
 static char *tmpSudoProb;
 
 template <typename Dtype>
@@ -30,13 +33,19 @@ unsigned int __builtin_popcount(Dtype u)
 	return u;
 }
 
+static int SudoSize = 0;//å­˜æ”¾ä¼ å…¥çš„æ•°ç‹¬å¤§å°
+
 void dfs(int dep)
 {
 	/*Timeout_end = clock();
 	if (Timeout_end - Timeout_start > 1000)
 		return;*/
+	if (FinalIdx >= SudoSize) {
+		longjmp(buf, 1);
+	}
 	if (!dep)
 	{
+		printf("dep = %d\n", dep);
 		for (int i = 1; i <= 9; i++) {
 			for (int j = 1; j <= 8; j++) {
 				//solvesudoku += (SudoMat[i][j] + '0');
@@ -54,8 +63,8 @@ void dfs(int dep)
 		//solvesudoku += '\n';
 		tmpSudoProb[FinalIdx++] = '\n';
 
-		//longjmp(buf, 1);	//Ìø³öËÀÑ­»· 
-		return;
+		longjmp(buf, 1);	//è·³å‡ºæ­»å¾ªçŽ¯ 
+		//return;
 	}
 	int b[10][10], c[10][10], x = 0, y = 0, z = 9;
 	for (int i = 1; i <= 9; i++)
@@ -89,7 +98,7 @@ void dfs(int dep)
 				}
 			}
 			dfs(dep - 1);
-			if (dep - 1 == 0) return;//////////
+			//if (dep - 1 == 0) return;//////////
 			for (int i = 1; i <= 9; i++)
 			{
 				for (int j = 1; j <= 9; j++)
@@ -126,45 +135,56 @@ static void InitSolve()
 	}
 }
 
-static bool Isdigit(char c) {
+bool Isdigit(char c) {
 
-	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+	return c >= '0' && c <= '9';
 }
 
-int Solver(char * SudoProb) {//´«ÈëµÄ²ÎÊýÎªËùÓÐÊý¶ÀÖÕ¾Ö
-	tmpSudoProb = SudoProb;
-	int idx = 0, cnt = 0, Complete = 0, NotZero = 0;//idxÓÃÀ´¼ÆËãµ±Ç°ËÑË÷µÄ×Ö·û´®Î»ÖÃ£¬CompleteÓÃÀ´È·¶¨µ±Ç°ËÑË÷µ½µÄÊÇÒ»¸öÍêÕûµÄÊý¶ÀÖÕ¾Ö
-	for (int i = 1; i <= 1023; i++)num[i] = __builtin_popcount(i);
-	while (SudoProb[idx++] != '\0') {
 
-		if (Isdigit(SudoProb[idx])) {
-			cnt++;		//cntÓÃÀ´¼ÆËãµ±Ç°µÄ×ÜÊäÈëÊý×Ö¸öÊý
+
+int Solver(char * SudoProb, int Size) {//ä¼ å…¥çš„å‚æ•°ä¸ºæ‰€æœ‰æ•°ç‹¬ç»ˆå±€
+	tmpSudoProb = SudoProb;
+	SudoSize = Size;
+	int idx = 0, cnt = 0, Complete = 0, NotZero = 0;//idxç”¨æ¥è®¡ç®—å½“å‰æœç´¢çš„å­—ç¬¦ä¸²ä½ç½®ï¼ŒCompleteç”¨æ¥ç¡®å®šå½“å‰æœç´¢åˆ°çš„æ˜¯ä¸€ä¸ªå®Œæ•´çš„æ•°ç‹¬ç»ˆå±€
+	for (int i = 1; i <= 1023; i++)num[i] = __builtin_popcount(i);
+	while (SudoProb[idx] != '\0') {
+
+		if (Isdigit(SudoProb[idx])) {//
+			cnt++;		//cntç”¨æ¥è®¡ç®—å½“å‰çš„æ€»è¾“å…¥æ•°å­—ä¸ªæ•°
 			int Num = SudoProb[idx] - '0';
 			if (Num) {
-				SudoMat[cnt / 9 + 1][cnt % 9 + 1] = Num;
+				SudoMat[(cnt - 1) / 9 + 1][(cnt - 1) % 9 + 1] = Num;
 				NotZero++;
-			}
-			if (cnt == 81) {//½ÓÊÕÒ»¸öÍêÕûµÄÆå¾Ö
+			}//
+			if (cnt == 81) {//æŽ¥æ”¶ä¸€ä¸ªå®Œæ•´çš„æ£‹å±€
 				//start_solve = clock();
 				cnt = 0;
-
-				/*if (cnt == 0)	//ÊäÈëÈ«0£¬ÈÎÒâÊä³ö 
+				
+				/*if (cnt == 0)	//è¾“å…¥å…¨0ï¼Œä»»æ„è¾“å‡º 
 				{
 					createCompleteSudoku(0);
 					continue;
 				}*/
-
+				
 				InitSolve();
-
-				dfs(81 - cnt);
-				cnt = 0;
+				printf("NotZero = %d\n", NotZero);
+				for (int i = 1; i <= 9; i++) {
+					for (int j = 1; j <= 9; j++) {
+						printf("%d", SudoMat[i][j]);
+					}
+					printf("\n");
+				}
+				while(!setjmp(buf))
+					dfs(81 - NotZero);
+				
+				NotZero = 0;
 				memset(SudoMat, 0, sizeof(SudoMat));
 				memset(num, 0, sizeof(num));
 				memset(id, 0, sizeof(id));
 
 			}
 		}
-
+		idx++;
 	}
 
 	return 0;
