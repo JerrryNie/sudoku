@@ -4,6 +4,7 @@
 #include "pch.h"
 #include "solver.h"
 #include "CheckSudo.h"
+#include "generator.h"
 #include <iostream>
 #include <cstdio>
 #include <cstring>
@@ -15,15 +16,16 @@ using namespace std;
 
 static FILE * WriteP = NULL;//用于写数独终局
 
-const static int RowTransNum = 30;		//行变换总数为30个
-const static int ColTransNum = 40320;	//列变换总数为40320个
+static const int Sudolen = 9 * 18;//用于计算单个数独总长度
+//const static int RowTransNum = 30;		//行变换总数为30个
+//const static int ColTransNum = 40320;	//列变换总数为40320个
 
-const static int Row = 9, Col = 9;		//行数和列数分别都为9
+//const static int Row = 9, Col = 9;		//行数和列数分别都为9
 
 const static int MaxSudo = 1000000;
 
 const static char TOPLEFT = '5';//学号后两位是22，因而左上角是5
-const static char RowTrans[40][10] = {//给所有的行变换打表
+/*const static char RowTrans[40][10] = {//给所有的行变换打表
 	{1,2,3,4,5,6,7,9,8},
 	{1,2,3,4,5,6,8,7,9},
 	{1,2,3,4,5,6,8,9,7},
@@ -61,8 +63,8 @@ const static char RowTrans[40][10] = {//给所有的行变换打表
 	{1,2,3,6,5,4,9,8,7},
 	{1,2,3,6,5,4,7,8,9}
 
-};
-
+};*/
+/*
 const static int GenerateSudoFromFirstRow[10][10] = {	//根据第一行的情况，生成之后所有的行
 	{1,2,3,4,5,6,7,8,9},
 	{7,8,9,1,2,3,4,5,6},
@@ -74,17 +76,17 @@ const static int GenerateSudoFromFirstRow[10][10] = {	//根据第一行的情况
 	{9,1,2,3,4,5,6,7,8},
 	{6,7,8,9,1,2,3,4,5}
 };
-
+*/
 //static int ColTrans[10] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 };//列变换映射向量
 
-static char Rrow[11] = { '5', '1', '2', '3', '4', '6', '7', '8', '9', '\0', '\0'}; //最后加上换行符以及字符串结束符
-
+//static char Rrow[11] = { '5', '1', '2', '3', '4', '6', '7', '8', '9', '\0', '\0'}; //最后加上换行符以及字符串结束符
+/*
 static char tmpSudoMatrix[9][18];	//记录每次列变换之后的数独终局
 static char tmpSudoMatrix2[9][18];	//记录每次行变换之后的数独终局
-
+*/
 static char FinalSudo[1000000 * (9 * 18 + 1)];
 static char SudoProblem[1000000 * (9 * 18 + 1)];
-static char CheckMat[1000];
+static char CheckMat[1000];/*
 static void GenerateSudo(int Num) {
 
 	int cntGenerate = 0;	 //记录当前生成的数独数
@@ -127,10 +129,10 @@ static void GenerateSudo(int Num) {
 		
 	}
 }
-
+*/
 static bool CheckValid(char * str) {//检查输入参数是否为int
 
-	int len = strlen(str);
+	int len = (int)strlen(str);
 	for (int i = 0; i < len; i++) {
 		if (!(str[i] >= '0' && str[i] <= '9'))
 			return false;
@@ -152,7 +154,7 @@ int main(int argc, char * argv[])
 	//处理命令行输入部分
 	int way = -1;//0表示处理生成，1表示处理求解
 	
-	memset(tmpSudoMatrix, sizeof(tmpSudoMatrix), 0);
+	//memset(tmpSudoMatrix, sizeof(tmpSudoMatrix), 0);
 	int GenerateNum = 10;
 	if (argc == 3 && !strcmp("-c", argv[1]) && strlen(argv[1]) == 2) {//-c
 		
@@ -190,8 +192,10 @@ int main(int argc, char * argv[])
 		}
 		clock_t StartGenerate = clock();
 	
-
-		GenerateSudo(GenerateNum);	//第二步，生成相应的数独
+		int cntGenerate = Generator(FinalSudo,GenerateNum);
+		fwrite(FinalSudo, sizeof(char), cntGenerate * (Sudolen + 1) - 2, WriteP);//打印本终局
+		//CheckSudo(FinalSudo, cntGenerate * (sizeof(tmpSudoMatrix2) + 1) - 2);//用以检测数独终局的合法性
+		///GenerateSudo(GenerateNum);	//第二步，生成相应的数独
 
 		clock_t EndGenerate = clock();
 
@@ -200,6 +204,8 @@ int main(int argc, char * argv[])
 		fclose(WriteP);//第四步，关闭文件指针
 	}
 	else if (way == 1) {
+
+		
 		clock_t StartSolve = clock();
 
 		int idx = 0;
