@@ -28,6 +28,7 @@ const static char TOPLEFT = '5';//学号后两位是22，因而左上角是5
 //static char SudoProblem[1000000 * (9 * 18 + 1)];
 static char CheckMat[1000];
 
+
 static bool CheckValid(char * str) {//检查输入参数是否为int
 
 	int len = (int)strlen(str);
