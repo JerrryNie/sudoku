@@ -88,7 +88,6 @@ int Generator(char * FinalSudo, int Num) {//Num是生成数独的数量, FinalSudo记录最
 				}
 			}
 			tmpSudoMatrix[r][17] = '\n';
-			tmpSudoMatrix[r][18] = 0;
 		}
 		for (int i = 0; i < RowTransNum; i++) {		//遍历所有的行变换
 

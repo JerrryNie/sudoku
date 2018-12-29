@@ -24,11 +24,11 @@ void TransferModule(int way, int GenerateNum, FILE *WriteP, FILE *absolute_path_
 		clock_t StartGenerate = clock();
 
 		int cntGenerate = Generator(FinalSudo, GenerateNum);//进入生成数独模块
-		fwrite(FinalSudo, sizeof(char), cntGenerate * (Sudolen + 1) - 2, WriteP);//打印本终局
+		fwrite(FinalSudo, sizeof(char), (long long)cntGenerate * (long long)(Sudolen + 1) - 2, WriteP);//打印本终局
 		//CheckSudo(FinalSudo, cntGenerate * (sizeof(tmpSudoMatrix2) + 1) - 2);//用以检测数独终局的合法性
 
 		clock_t EndGenerate = clock();
-		printf("Generating Sudoku time cost = %.2fms\n", ((double)(EndGenerate - StartGenerate)));//第三步，显示总耗时
+		printf("Generating Sudoku time cost = %.2fms\n", ((double)((long long)EndGenerate - StartGenerate)));//第三步，显示总耗时
 
 		fclose(WriteP);//第四步，关闭文件指针
 	}
@@ -52,11 +52,12 @@ void TransferModule(int way, int GenerateNum, FILE *WriteP, FILE *absolute_path_
 			exit(1);
 		}
 		//将文件结果写回文件
-		fwrite(SudoProblem, 1, idx, WriteTheSolution);
+		if(WriteTheSolution != NULL)
+			fwrite(SudoProblem, 1, idx, WriteTheSolution);
 
 		clock_t SolveEnd = clock();//求解数独计时结束
 
-		printf("Solving Sudoku time cost = %.2fms\n", ((double)(SolveEnd - SolveStart)));
+		printf("Solving Sudoku time cost = %.2fms\n", ((double)((long long)SolveEnd - SolveStart)));
 		//printf("打印求解数独的结果：\n");
 		//for (int i = 0; i < idx; i++)putchar(SudoProblem[i]);//打印出求解数独的结果
 	}

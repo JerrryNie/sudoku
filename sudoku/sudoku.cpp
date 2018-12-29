@@ -47,6 +47,7 @@ void CloseAllFile() {//一次性将打开的所有文件关闭
 
 int main(int argc, char * argv[])
 {
+	//printf("size = %d\n", sizeof(int));
 	int way = -1;//0表示处理生成，1表示处理求解
 	
 	int GenerateNum = 0;
