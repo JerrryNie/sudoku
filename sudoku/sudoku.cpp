@@ -5,6 +5,7 @@
 #include "CheckSudo.h"
 #include "generator.h"
 #include "InputProcess.h"
+#include "TransferModule.h"
 #include <iostream>
 #include <cstdio>
 #include <cstring>
@@ -16,14 +17,15 @@ using namespace std;
 
 static FILE * WriteP = NULL;//用于写数独终局
 static FILE *absolute_path_of_puzzlefile = NULL;//指向写入数独求解结果的文件
+static FILE * WriteTheSolution = NULL;
 
-static const int Sudolen = 9 * 18;//用于计算单个数独总长度
-//const static int MaxSudo = 1000000;
+
+//static const int Sudolen = 9 * 18;//用于计算单个数独总长度
 
 const static char TOPLEFT = '5';//学号后两位是22，因而左上角是5
 
-static char FinalSudo[1000000 * (9 * 18 + 1)];
-static char SudoProblem[1000000 * (9 * 18 + 1)];
+//static char FinalSudo[1000000 * (9 * 18 + 1)];
+//static char SudoProblem[1000000 * (9 * 18 + 1)];
 static char CheckMat[1000];
 
 static bool CheckValid(char * str) {//检查输入参数是否为int
@@ -44,90 +46,13 @@ void CloseAllFile() {//一次性将打开的所有文件关闭
 
 int main(int argc, char * argv[])
 {
-	//处理命令行输入部分
 	int way = -1;//0表示处理生成，1表示处理求解
 	
 	int GenerateNum = 0;
-	InputProcess(argc, argv, way, GenerateNum, WriteP, absolute_path_of_puzzlefile);
-	/*if (argc == 3 && !strcmp("-c", argv[1]) && strlen(argv[1]) == 2) {//-c
-		
-		if (!CheckValid(argv[2])) {	//检查第二个数字是否为合法整数
-			printf("输入生成终局参数不合法！\n");
-			exit(1);
-		}
-		else {
-			GenerateNum = atoi(argv[2]);
-			if (GenerateNum > MaxSudo) {
-				printf("超出最大数独终局生成量！\n");
-				exit(1);
-			}
-		}
-		way = 0;
-	}
-	else if (argc == 3 && !strcmp("-s", argv[1]) && strlen(argv[1]) == 2) {//-s
-
-		printf("这是一个关于求解数独的测试分支!！\n");
-		if (fopen_s(&absolute_path_of_puzzlefile, argv[2], "r")) {
-			printf("sudoku.txt打开失败\n");
-			exit(1);
-		}
-		//return 0;
-		way = 1;
-	}
-	else {
-		printf("Invaid input parameters!\n");
-		exit(1);
-	}*/
-	if(way == 0) {
-		/*if (fopen_s(&WriteP, "sudoku.txt", "w")) {//第一步，打开要写的文件
-			printf("sudoku.txt打开失败\n");
-			exit(1);
-		}*/
-		clock_t StartGenerate = clock();
+	InputProcess(argc, argv, way, GenerateNum, WriteP, absolute_path_of_puzzlefile);//进行输入数据处理
 	
-		int cntGenerate = Generator(FinalSudo,GenerateNum);
-		fwrite(FinalSudo, sizeof(char), cntGenerate * (Sudolen + 1) - 2, WriteP);//打印本终局
-		//CheckSudo(FinalSudo, cntGenerate * (sizeof(tmpSudoMatrix2) + 1) - 2);//用以检测数独终局的合法性
-		
-		clock_t EndGenerate = clock();
-
-		printf("Generating Sudoku time cost = %.2fms\n", ((double)(EndGenerate - StartGenerate)));//第三步，显示总耗时
-
-		fclose(WriteP);//第四步，关闭文件指针
-	}
-	else if (way == 1) {
-
-		
-		clock_t StartSolve = clock();
-
-		int idx = 0;
-		char c = 0;
-		clock_t SolveStart = clock();//求解数独计时开始
-		while (((c = fgetc(absolute_path_of_puzzlefile)) != EOF) && c) {
-			
-			SudoProblem[idx] = c;
-			idx++;
-		}
-
-		int flag = Solver(SudoProblem, idx);	//求解数独
-
-		FILE * WriteTheSolution = NULL;
-		//for (int i = 0; i < idx; i++)putchar(SudoProblem[i]);//打印出求解数独的结果
-		if (fopen_s(&WriteTheSolution, ".\\sudoku.txt", "w")) {
-			printf("向sudoku.txt写入最终结果前，打开文件失败\n");
-			//fwrite(SudoProblem, 1, idx, WriteTheSolution);
-			exit(1);
-		}
-		//将文件结果写回文件
-		fwrite(SudoProblem, 1, idx, WriteTheSolution);
-
-		clock_t SolveEnd = clock();//求解数独计时结束
-
-		printf("Generating Sudoku time cost = %.2fms\n", ((double)(SolveEnd - SolveStart)));
-		printf("打印求解数独的结果：\n");
-		for (int i = 0; i < idx; i++)putchar(SudoProblem[i]);//打印出求解数独的结果
-	}
-	CloseAllFile();
+	TransferModule(way, GenerateNum, WriteP, absolute_path_of_puzzlefile, WriteTheSolution);//转向事务中心，进行必要的活动路径调用
+	CloseAllFile();//关闭所有的文件指针(若尚未关闭)
 }
 
 // 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单

@@ -156,6 +156,7 @@
     <ClInclude Include="InputProcess.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="solver.h" />
+    <ClInclude Include="TransferModule.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CheckSudo.cpp" />
@@ -169,6 +170,7 @@
     </ClCompile>
     <ClCompile Include="solver.cpp" />
     <ClCompile Include="sudoku.cpp" />
+    <ClCompile Include="TransferModule.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
