@@ -195,6 +195,7 @@ int main(int argc, char * argv[])
 	if(way == 0) {
 	clock_t StartGenerate = clock();
 	
+
 	GenerateSudo(GenerateNum);	//生成相应的数独
 
 	clock_t EndGenerate = clock();
