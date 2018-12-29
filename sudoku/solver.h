@@ -5,7 +5,6 @@
 #include <cstdlib>
 #include <stdio.h>
 #include <Windows.h>
-int Solver(char * path);
+int Solver(char * path, int );
 
 #endif // !SOLVER_H
-
