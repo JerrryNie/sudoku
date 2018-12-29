@@ -122,7 +122,7 @@ static void InitSolve()
 	}
 }
 
-bool Isdigit(char c) {
+static bool Isdigit(char c) {
 
 	return c >= '0' && c <= '9';
 }

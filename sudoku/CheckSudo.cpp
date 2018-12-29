@@ -6,8 +6,9 @@
 
 
 using namespace std;
-extern bool Isdigit(char);
-
+static bool Isdigit(char c) {
+	return c >= '0' && c <= '9';
+}
 static int SudoMat[10][10];
 //static int Bitmap[10];
 static bool Check(int SudoMat[][10]) {//检查某一特定的数独合法性
