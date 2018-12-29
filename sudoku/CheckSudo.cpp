@@ -45,13 +45,6 @@ static bool Check(int SudoMat[][10]) {//检查某一特定的数独合法性
 	}
 	const int dr[] = { 0, 1, 2 };
 	const int dc[] = { 0, 1, 2 };
-	/*printf("---------------\n");
-	for (int i = 1; i <= 9; i++) {
-		for (int j = 1; j <= 9; j++) {
-			printf("%d", SudoMat[i][j]);
-		}
-		puts("");
-	}*/
 	for (int i = 1; i <= 9; i += 3) {
 		
 		for (int j = 1; j <= 9; j += 3) {
@@ -95,7 +88,6 @@ bool CheckSudo(char * SudoAllMat, int Size) {//检查输入的所有数独的正
 
 			int Correct = Check(SudoMat);
 			CntSudo++;
-			//printf("id : %d\tCorrect : %d", CntSudo, Correct);
 			if (Correct == false) {
 				printf("非法数独：%d\n", CntSudo);
 			}

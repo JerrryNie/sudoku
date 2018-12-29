@@ -12,13 +12,9 @@ static int asfds = 0;
 static int all = (1 << 9) - 1;
 static int num[1 << 10];
 static jmp_buf buf;
-//FILE *P; //读取数独文件
-
-//extern char * SudoProb; //在sudoku中修改要求解的数独题目，并将此变量修改，在本求解函数中使用，因为传入数据可能会很大，所以
 static int SudoMat[10][10];//存放当前待解的数独矩阵
 static int id[10][10];
 static bool JumpOut = false;
-//clock_t Timeout_start, Timeout_end;
 static int FinalIdx = 0;//用于向最终的求解矩阵中写结果(利用传入的矩阵)
 static char *tmpSudoProb;
 
@@ -37,34 +33,26 @@ static int SudoSize = 0;//存放传入的数独大小
 
 void dfs(int dep)
 {
-	/*Timeout_end = clock();
-	if (Timeout_end - Timeout_start > 1000)
-		return;*/
 	if (FinalIdx >= SudoSize) {
 		longjmp(buf, 1);
 	}
 	if (!dep)
 	{
-		printf("dep = %d\n", dep);
+		//printf("dep = %d\n", dep);
 		for (int i = 1; i <= 9; i++) {
 			for (int j = 1; j <= 8; j++) {
-				//solvesudoku += (SudoMat[i][j] + '0');
 				tmpSudoProb[FinalIdx++] = SudoMat[i][j] + '0';
 				tmpSudoProb[FinalIdx++] = ' ';
-				//solvesudoku += ' ';
+				
 			}
-			//solvesudoku += (SudoMat[i][9] + '0');
 			tmpSudoProb[FinalIdx++] = SudoMat[i][9] + '0';
 
-			//solvesudoku += '\n';
 			tmpSudoProb[FinalIdx++] = '\n';
 
 		}
-		//solvesudoku += '\n';
 		tmpSudoProb[FinalIdx++] = '\n';
 
 		longjmp(buf, 1);	//跳出死循环 
-		//return;
 	}
 	int b[10][10], c[10][10], x = 0, y = 0, z = 9;
 	for (int i = 1; i <= 9; i++)
@@ -98,7 +86,6 @@ void dfs(int dep)
 				}
 			}
 			dfs(dep - 1);
-			//if (dep - 1 == 0) return;//////////
 			for (int i = 1; i <= 9; i++)
 			{
 				for (int j = 1; j <= 9; j++)
@@ -157,23 +144,16 @@ int Solver(char * SudoProb, int Size) {//传入的参数为所有数独终局
 				NotZero++;
 			}//
 			if (cnt == 81) {//接收一个完整的棋局
-				//start_solve = clock();
 				cnt = 0;
 				
-				/*if (cnt == 0)	//输入全0，任意输出 
-				{
-					createCompleteSudoku(0);
-					continue;
-				}*/
-				
 				InitSolve();
-				printf("NotZero = %d\n", NotZero);
-				for (int i = 1; i <= 9; i++) {
+				//printf("NotZero = %d\n", NotZero);
+				/*for (int i = 1; i <= 9; i++) {
 					for (int j = 1; j <= 9; j++) {
 						printf("%d", SudoMat[i][j]);
 					}
 					printf("\n");
-				}
+				}*/
 				while(!setjmp(buf))
 					dfs(81 - NotZero);
 				

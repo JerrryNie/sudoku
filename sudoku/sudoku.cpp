@@ -104,8 +104,6 @@ static void GenerateSudo(int Num) {
 			tmpSudoMatrix[r][17] = '\n';
 			tmpSudoMatrix[r][18] = 0;
 		}
-		//tmpSudoMatrix[9][0] = '\n';//完成一个终局，输入回车
-		//tmpSudoMatrix[9][1] = '\0';
 		for (int i = 0; i < RowTransNum; i++) {		//遍历所有的行变换
 			
 			if (cntGenerate >= Num) {
@@ -115,18 +113,12 @@ static void GenerateSudo(int Num) {
 				return; //当达到最大的生成数量时，即停止生成
 			}
 			for (int j = 0; j < Row; j++) {//“+1”是为了输入回车换行
-				//printf("j = %d:", j);
-					memcpy(tmpSudoMatrix2[j], tmpSudoMatrix[RowTrans[i][j] - 1], sizeof(tmpSudoMatrix[j]));
-					//fwrite(tmpSudoMatrix[RowTrans[i][j] - 1], sizeof(char), sizeof(tmpSudoMatrix[RowTrans[i][j] - 1]) / sizeof(char), WriteP);
-					//fwrite(tmpSudoMatrix[RowTrans[i][j] - 1], 1, 18, WriteP);
+				memcpy(tmpSudoMatrix2[j], tmpSudoMatrix[RowTrans[i][j] - 1], sizeof(tmpSudoMatrix[j]));
+
 				
 			}
-			//tmpSudoMatrix2[9][0] = '\n';	
-			
-			//fwrite(tmpSudoMatrix2, sizeof(char), sizeof(tmpSudoMatrix2) / sizeof(char), WriteP);//打印本终局
 			memcpy(FinalSudo + cntGenerate * (sizeof(tmpSudoMatrix2) + 1), tmpSudoMatrix2, sizeof(tmpSudoMatrix2));
 			memcpy(FinalSudo + cntGenerate * (sizeof(tmpSudoMatrix2) + 1) + sizeof(tmpSudoMatrix2), "\n", 1);
-			//fputc('\n', WriteP);
 			cntGenerate++;
 			
 			
@@ -156,11 +148,10 @@ int main(int argc, char * argv[])
 {
 	FILE *absolute_path_of_puzzlefile = NULL;
 	
+
+	//处理命令行输入部分
 	int way = -1;//0表示处理生成，1表示处理求解
-	if (fopen_s(&WriteP, "sudoku.txt", "w")) {
-		printf("sudoku.txt打开失败\n");
-		exit(1);
-	}
+	
 	memset(tmpSudoMatrix, sizeof(tmpSudoMatrix), 0);
 	int GenerateNum = 10;
 	if (argc == 3 && !strcmp("-c", argv[1]) && strlen(argv[1]) == 2) {//-c
@@ -193,36 +184,28 @@ int main(int argc, char * argv[])
 		exit(1);
 	}
 	if(way == 0) {
-	clock_t StartGenerate = clock();
-	
-
-	GenerateSudo(GenerateNum);	//生成相应的数独
-
-	clock_t EndGenerate = clock();
-
-	printf("Generating Sudoku time cost = %.2fms\n", ((double)(EndGenerate - StartGenerate)));
-
-	fclose(WriteP);
-	}
-	else if (way == 1) {
-		/*if (fopen_s(&absolute_path_of_puzzlefile, "F:\\ProblemSudo.txt", "r")) {
+		if (fopen_s(&WriteP, "sudoku.txt", "w")) {//第一步，打开要写的文件
 			printf("sudoku.txt打开失败\n");
 			exit(1);
-		}*/
-		clock_t StartSolve = clock();
+		}
+		clock_t StartGenerate = clock();
+	
 
-		//fread(SudoProblem, 1, sizeof(SudoProblem), absolute_path_of_puzzlefile);//从文件读取数独信息
+		GenerateSudo(GenerateNum);	//第二步，生成相应的数独
+
+		clock_t EndGenerate = clock();
+
+		printf("Generating Sudoku time cost = %.2fms\n", ((double)(EndGenerate - StartGenerate)));//第三步，显示总耗时
+
+		fclose(WriteP);//第四步，关闭文件指针
+	}
+	else if (way == 1) {
+		clock_t StartSolve = clock();
 
 		int idx = 0;
 		char c = 0;
+		clock_t SolveStart = clock();//求解数独计时开始
 		while (((c = fgetc(absolute_path_of_puzzlefile)) != EOF) && c) {
-			if ((c >= '0' && c <= '9') || c == ' ') {
-				putchar(c);
-			}
-			else {
-				printf("c = %d\n", c);
-			}
-			//printf("%c", c);
 			
 			SudoProblem[idx] = c;
 			idx++;
@@ -231,14 +214,21 @@ int main(int argc, char * argv[])
 		int flag = Solver(SudoProblem, idx);	//求解数独
 
 		FILE * WriteTheSolution = NULL;
-		for (int i = 0; i < idx; i++)putchar(SudoProblem[i]);
-		if (fopen_s(&WriteTheSolution, "sudoku_test2.txt", "w")) {
+		//for (int i = 0; i < idx; i++)putchar(SudoProblem[i]);//打印出求解数独的结果
+		if (fopen_s(&WriteTheSolution, ".\\sudoku.txt", "w")) {
 			printf("向sudoku.txt写入最终结果前，打开文件失败\n");
+			//fwrite(SudoProblem, 1, idx, WriteTheSolution);
 			exit(1);
 		}
-		printf("---\n");
+		//printf("---\n");
 		//将文件结果写回文件
 		fwrite(SudoProblem, 1, idx, WriteTheSolution);
+
+		clock_t SolveEnd = clock();//求解数独计时结束
+
+		printf("Generating Sudoku time cost = %.2fms\n", ((double)(SolveEnd - SolveStart)));
+		printf("打印求解数独的结果：\n");
+		for (int i = 0; i < idx; i++)putchar(SudoProblem[i]);//打印出求解数独的结果
 	}
 	//
 	/*FILE * CheckPoint = NULL;
