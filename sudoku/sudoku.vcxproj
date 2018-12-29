@@ -153,12 +153,14 @@
   <ItemGroup>
     <ClInclude Include="CheckSudo.h" />
     <ClInclude Include="generator.h" />
+    <ClInclude Include="InputProcess.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="solver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CheckSudo.cpp" />
     <ClCompile Include="generator.cpp" />
+    <ClCompile Include="InputProcess.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
