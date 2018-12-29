@@ -1,4 +1,4 @@
-//#include "stdafx.h"
+﻿//#include "stdafx.h"
 #include "solver.h"
 #include "pch.h"
 #include <string.h>

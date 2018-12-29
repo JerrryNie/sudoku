@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "CheckSudo.h"
 #include <string.h>
 #include <math.h>
@@ -10,10 +10,10 @@ extern bool Isdigit(char);
 
 static int SudoMat[10][10];
 //static int Bitmap[10];
-static bool Check(int SudoMat[][10]) {//¼ì²éÄ³Ò»ÌØ¶¨µÄÊı¶ÀºÏ·¨ĞÔ
+static bool Check(int SudoMat[][10]) {//æ£€æŸ¥æŸä¸€ç‰¹å®šçš„æ•°ç‹¬åˆæ³•æ€§
 
 	int BitMap[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-	for (int i = 1; i <= 9; i++) {//¼ì²éĞĞ·½ÏòºÏ·¨ĞÔ
+	for (int i = 1; i <= 9; i++) {//æ£€æŸ¥è¡Œæ–¹å‘åˆæ³•æ€§
 
 		for (int j = 1; j <= 9; j++) {
 			BitMap[SudoMat[i][j]] = true;
@@ -21,15 +21,15 @@ static bool Check(int SudoMat[][10]) {//¼ì²éÄ³Ò»ÌØ¶¨µÄÊı¶ÀºÏ·¨ĞÔ
 		for (int j = 1; j <= 9; j++) {
 			if (BitMap[j] == false) {
 			
-				printf("ĞĞ·Ç·¨£º%d, %d\n", i, j);
-				return false;//³öÏÖ²»ºÏ·¨Êı¶À
+				printf("è¡Œéæ³•ï¼š%d, %d\n", i, j);
+				return false;//å‡ºç°ä¸åˆæ³•æ•°ç‹¬
 
 			}
 		}
 		memset(BitMap, 0, sizeof(BitMap));
 	}
 
-	for (int j = 1; j <= 9; j++) {//¼ì²éÁĞ·½ÏòºÏ·¨ĞÔ
+	for (int j = 1; j <= 9; j++) {//æ£€æŸ¥åˆ—æ–¹å‘åˆæ³•æ€§
 
 		for (int i = 1; i <= 9; i++) {
 			BitMap[SudoMat[i][j]] = true;
@@ -37,8 +37,8 @@ static bool Check(int SudoMat[][10]) {//¼ì²éÄ³Ò»ÌØ¶¨µÄÊı¶ÀºÏ·¨ĞÔ
 		for (int i = 1; i <= 9; i++) {
 			if (BitMap[i] == false) {
 			
-				printf("ÁĞ·Ç·¨£º%d, %d\n", i, j);
-				return false;//³öÏÖ²»ºÏ·¨Êı¶À
+				printf("åˆ—éæ³•ï¼š%d, %d\n", i, j);
+				return false;//å‡ºç°ä¸åˆæ³•æ•°ç‹¬
 			}
 		}
 		memset(BitMap, 0, sizeof(BitMap));
@@ -64,8 +64,8 @@ static bool Check(int SudoMat[][10]) {//¼ì²éÄ³Ò»ÌØ¶¨µÄÊı¶ÀºÏ·¨ĞÔ
 			for (int m = 1; m <= 9; m++) {
 				if (BitMap[m] == false) {
 			
-					printf("3*3·Ç·¨£º%d, %d\n", i, j);
-					return false;//³öÏÖ²»ºÏ·¨Êı¶À
+					printf("3*3éæ³•ï¼š%d, %d\n", i, j);
+					return false;//å‡ºç°ä¸åˆæ³•æ•°ç‹¬
 				}
 			}
 			memset(BitMap, 0, sizeof(BitMap));
@@ -74,11 +74,11 @@ static bool Check(int SudoMat[][10]) {//¼ì²éÄ³Ò»ÌØ¶¨µÄÊı¶ÀºÏ·¨ĞÔ
 	return true;
 }
 
-bool CheckSudo(char * SudoAllMat, int Size) {//¼ì²éÊäÈëµÄËùÓĞÊı¶ÀµÄÕıÈ·ĞÔ
+bool CheckSudo(char * SudoAllMat, int Size) {//æ£€æŸ¥è¾“å…¥çš„æ‰€æœ‰æ•°ç‹¬çš„æ­£ç¡®æ€§
 
 	int idx = 0;
-	int CntNum = 0;//¼ÆËãÊäÈëµÄÊı×ÖÁ¿
-	int CntSudo = 0;//¼ÆËãÊı¶ÀÊıÁ¿
+	int CntNum = 0;//è®¡ç®—è¾“å…¥çš„æ•°å­—é‡
+	int CntSudo = 0;//è®¡ç®—æ•°ç‹¬æ•°é‡
 	while (SudoAllMat[idx] != '\0' && idx < Size) {
 
 		if (Isdigit(SudoAllMat[idx]) && SudoAllMat[idx] == '0') {
@@ -97,7 +97,7 @@ bool CheckSudo(char * SudoAllMat, int Size) {//¼ì²éÊäÈëµÄËùÓĞÊı¶ÀµÄÕıÈ·ĞÔ
 			CntSudo++;
 			//printf("id : %d\tCorrect : %d", CntSudo, Correct);
 			if (Correct == false) {
-				printf("·Ç·¨Êı¶À£º%d\n", CntSudo);
+				printf("éæ³•æ•°ç‹¬ï¼š%d\n", CntSudo);
 			}
 			CntNum = 0;
 			memset(SudoMat, 0, sizeof(SudoMat));
@@ -105,6 +105,6 @@ bool CheckSudo(char * SudoAllMat, int Size) {//¼ì²éÊäÈëµÄËùÓĞÊı¶ÀµÄÕıÈ·ĞÔ
 
 		idx++;
 	}
-	printf("ËùÓĞÊı¶À¾ùºÏ·¨\n");
+	printf("æ‰€æœ‰æ•°ç‹¬å‡åˆæ³•\n");
 	return true;
 }

@@ -1,4 +1,4 @@
-// sudoku.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
+﻿// sudoku.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
 //
 
 #include "pch.h"
@@ -189,7 +189,7 @@ int main(int argc, char * argv[])
 		way = 1;
 	}
 	else {
-		printf("输入操作参数不合法！\n");
+		printf("Invaid input parameters!\n");
 		exit(1);
 	}
 	if(way == 0) {
@@ -199,7 +199,7 @@ int main(int argc, char * argv[])
 
 	clock_t EndGenerate = clock();
 
-	printf("生成数独用时：%.2fms\n", ((double)(EndGenerate - StartGenerate)));
+	printf("Generating Sudoku time cost = %.2fms\n", ((double)(EndGenerate - StartGenerate)));
 
 	fclose(WriteP);
 	}
