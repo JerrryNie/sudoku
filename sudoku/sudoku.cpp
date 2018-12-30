@@ -42,7 +42,15 @@ static bool CheckValid(char * str) {//检查输入参数是否为int
 
 void CloseAllFile() {//一次性将打开的所有文件关闭
 
-
+	if (WriteP != NULL) {
+		fclose(WriteP);
+	}
+	if (absolute_path_of_puzzlefile != NULL) {
+		fclose(absolute_path_of_puzzlefile);
+	}
+	if (WriteTheSolution != NULL) {
+		fclose(WriteTheSolution);
+	}
 }
 
 int main(int argc, char * argv[])

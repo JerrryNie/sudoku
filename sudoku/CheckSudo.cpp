@@ -68,8 +68,10 @@ static bool Check(int SudoMat[][10]) {//检查某一特定的数独合法性
 	return true;
 }
 
+static int Used = 0;
 bool CheckSudo(char * SudoAllMat, int Size) {//检查输入的所有数独的正确性
-
+	if (Used == 0) Used = 1;
+	else return true;
 	int idx = 0;
 	int CntNum = 0;//计算输入的数字量
 	int CntSudo = 0;//计算数独数量
@@ -90,7 +92,7 @@ bool CheckSudo(char * SudoAllMat, int Size) {//检查输入的所有数独的正
 			int Correct = Check(SudoMat);
 			CntSudo++;
 			if (Correct == false) {
-				printf("非法数独：%d\n", CntSudo);
+				//printf("非法数独：%d\n", CntSudo);
 			}
 			CntNum = 0;
 			memset(SudoMat, 0, sizeof(SudoMat));
@@ -98,6 +100,6 @@ bool CheckSudo(char * SudoAllMat, int Size) {//检查输入的所有数独的正
 
 		idx++;
 	}
-	printf("所有数独均合法\n");
+	//printf("所有数独均合法\n");
 	return true;
 }
