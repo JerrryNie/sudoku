@@ -23,24 +23,27 @@ static bool CheckValid(char * str) {//检查输入参数是否为int
 	return true;
 }
 
-void InputProcess(int argc, char** argv, int &way, int &GenerateNum, FILE* &WriteP, FILE* &absolute_path_of_puzzlefile) {
+int InputProcess(int argc, char** argv, int &way, int &GenerateNum, FILE* &WriteP, FILE* &absolute_path_of_puzzlefile) {
 
 	if (argc == 3 && !strcmp("-c", argv[1]) && strlen(argv[1]) == 2) {//-c
 
 		if (!CheckValid(argv[2])) {	//检查第二个数字是否为合法整数
 			printf("输入生成终局参数不合法！\n");
-			exit(1);
+			return -1;
+			//exit(1);
 		}
 		else {
 			GenerateNum = atoi(argv[2]);
 			if (GenerateNum > MaxSudo) {
 				printf("超出最大数独终局生成量！\n");
-				exit(1);
+				return -1;
+				//exit(1);
 			}
 		}
 		if (fopen_s(&WriteP, "sudoku.txt", "w")) {//打开要写的文件
 			printf("sudoku.txt打开失败\n");
-			exit(1);
+			return -1;
+			//exit(1);
 		}
 		way = 0;
 	}
@@ -49,13 +52,16 @@ void InputProcess(int argc, char** argv, int &way, int &GenerateNum, FILE* &Writ
 		//printf("这是一个关于求解数独的测试分支!！\n");
 		if (fopen_s(&absolute_path_of_puzzlefile, argv[2], "r")) {
 			printf("sudoku.txt打开失败\n");
-			exit(1);
+			return -1;
+			//exit(1);
 		}
 		//return 0;
 		way = 1;
 	}
 	else {
 		printf("Invaid input parameters!\n");
-		exit(1);
+		return -1;
+		//exit(1);
 	}
+	return 0;
 }

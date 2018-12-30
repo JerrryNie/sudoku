@@ -54,14 +54,14 @@ void dfs(int dep)
 
 		longjmp(buf, 1);	//跳出死循环 
 	}
-	int b[10][10], c[10][10], x = 0, y = 0, z = 9;
+	int Map[10][10], c[10][10], x = 0, y = 0, z = 9;
 	for (int i = 1; i <= 9; i++)
 	{
 		for (int j = 1; j <= 9; j++)
 		{
 			if (!SudoMat[i][j] && !id[i][j])
 				return;
-			b[i][j] = SudoMat[i][j];
+			Map[i][j] = SudoMat[i][j];
 			c[i][j] = id[i][j];
 			if (!SudoMat[i][j])
 			{
@@ -90,7 +90,7 @@ void dfs(int dep)
 			{
 				for (int j = 1; j <= 9; j++)
 				{
-					id[i][j] = c[i][j], SudoMat[i][j] = b[i][j];
+					id[i][j] = c[i][j], SudoMat[i][j] = Map[i][j];
 				}
 			}
 		}

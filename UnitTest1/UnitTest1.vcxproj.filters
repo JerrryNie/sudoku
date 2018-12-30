@@ -15,48 +15,18 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="pch.h">
+    <ClInclude Include="stdafx.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="solver.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="CheckSudo.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="generator.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="InputProcess.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TransferModule.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Sudoku.h">
+    <ClInclude Include="targetver.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="pch.cpp">
+    <ClCompile Include="stdafx.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="sudoku.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="solver.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="CheckSudo.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="generator.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="InputProcess.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TransferModule.cpp">
+    <ClCompile Include="unittest1.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

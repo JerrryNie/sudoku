@@ -59,10 +59,13 @@ int main(int argc, char * argv[])
 	int way = -1;//0表示处理生成，1表示处理求解
 	
 	int GenerateNum = 0;
-	InputProcess(argc, argv, way, GenerateNum, WriteP, absolute_path_of_puzzlefile);//进行输入数据处理
+	int status = InputProcess(argc, argv, way, GenerateNum, WriteP, absolute_path_of_puzzlefile);//进行输入数据处理
+	if (status == -1) return status;
 	
 	TransferModule(way, GenerateNum, WriteP, absolute_path_of_puzzlefile, WriteTheSolution);//转向事务中心，进行必要的活动路径调用
 	CloseAllFile();//关闭所有的文件指针(若尚未关闭)
+	//printf("0\n");
+	return 0;
 }
 
 

@@ -95,7 +95,7 @@ int Generator(char * FinalSudo, int Num) {//Num是生成数独的数量, FinalSudo记录最
 			if (cntGenerate >= Num) {
 
 				//fwrite(FinalSudo, sizeof(char), cntGenerate * (sizeof(tmpSudoMatrix2) + 1) - 2, WriteP);//打印本终局
-				CheckSudo(FinalSudo, cntGenerate * (sizeof(tmpSudoMatrix2) + 1) - 2);//用以检测数独终局的合法性
+				//CheckSudo(FinalSudo, cntGenerate * (sizeof(tmpSudoMatrix2) + 1) - 2);//用以检测数独终局的合法性
 				return cntGenerate; //当达到最大的生成数量时，即停止生成，并返回主调函数，利用主调函数来进行最终数独的输出
 			}
 			for (int j = 0; j < Row; j++) {//“+1”是为了输入回车换行
